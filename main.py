@@ -18,6 +18,9 @@ os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
 # Set Streamlit page configuration
 st.set_page_config(page_title="Website Chat Assistant", layout="centered")
 
+# Title
+st.title("Website Chat Assistant")
+
 # Application Overview
 st.markdown("""
     **Overview:**  
@@ -31,9 +34,6 @@ st.markdown("""
     - Utilizes OpenAI's GPT-powered Llama-Index for creating a chat interface that allows users to ask questions about the website.  
     - Integrates embeddings for semantic search and retrieval capabilities.
 """)
-
-# Title
-st.title("Website Chat Assistant")
 
 # Initialize session state
 if "chat_ready" not in st.session_state:
