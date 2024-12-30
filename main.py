@@ -99,4 +99,4 @@ if st.session_state.chat_ready:
     user_query = st.text_input("Enter your question:")
     if st.button("Chat") and user_query:
         response = st.session_state.chat_engine.chat(user_query)
-        st.write("**AI Assistant:**", response)
+        st.write("**AI Assistant:**", response.response)
