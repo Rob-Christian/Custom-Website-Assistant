@@ -14,7 +14,7 @@ import qdrant_client
 import os
 
 # Get API Keys
-os.environ["GOOGLE_API_KEY"] = st.secrets("GOOGLE_API_KEY")
+os.environ["GOOGLE_API_KEY"] = st.secrets["GOOGLE_API_KEY"]
 
 # Set Streamlit page configuration
 st.set_page_config(page_title="Website Chat Assistant", layout="centered")
