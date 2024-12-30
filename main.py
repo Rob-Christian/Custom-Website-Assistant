@@ -74,22 +74,13 @@ if st.button("Process Website") and base_url:
             Settings.llm = llm
             Settings.embed_model = embedding_model
 
-            # Setup Qdrant
-            client = qdrant_client.QdrantClient(location=":memory:")
-            vector_store = QdrantVectorStore(
-                collection_name="website",
-                client=client,
-                enable_hybrid=True,
-                batch_size=20,
-            )
-
             # Load and index documents
             documents = SimpleWebPageReader(html_to_text=True).load_data(links)
-            storage_context = StorageContext.from_defaults(vector_store=vector_store)
+            storage_context = StorageContext.from_defaults()
             index = VectorStoreIndex.from_documents(
                 documents, storage_context=storage_context
             )
-            query_engine = index.as_query_engine(vector_store_query_mode="hybrid")
+            query_engine = index.as_query_engine()
             memory = ChatMemoryBuffer.from_defaults(token_limit=3000)
             chat_engine = index.as_chat_engine(
                 chat_mode="context",
