@@ -18,6 +18,20 @@ os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
 # Set Streamlit page configuration
 st.set_page_config(page_title="Website Chat Assistant", layout="centered")
 
+# Application Overview
+st.markdown("""
+    **Overview:**  
+    This application allows users to input a website URL. The app then crawls all links on the website 
+    that share the same root domain as the provided URL. Once the links are gathered, the app uses OpenAI's 
+    LLM with Llama-Index to create a retrieval-based chain for answering questions about the website's content.
+
+    **Features:**  
+    - Crawls and extracts links from the provided website, ensuring all links belong to the same root domain.  
+    - Processes the content of the extracted links and indexes it for efficient querying.  
+    - Utilizes OpenAI's GPT-powered Llama-Index for creating a chat interface that allows users to ask questions about the website.  
+    - Integrates embeddings for semantic search and retrieval capabilities.
+""")
+
 # Title
 st.title("Website Chat Assistant")
 
