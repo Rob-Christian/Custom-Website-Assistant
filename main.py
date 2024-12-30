@@ -10,7 +10,6 @@ from llama_index.core.memory import ChatMemoryBuffer
 from llama_index.vector_stores.qdrant import QdrantVectorStore
 from llama_index.llms.openai import OpenAI
 from llama_index.embeddings.fastembed import FastEmbedEmbedding
-import qdrant_client
 import os
 
 # Get API Keys
@@ -21,6 +20,12 @@ st.set_page_config(page_title="Website Chat Assistant", layout="centered")
 
 # Title
 st.title("Website Chat Assistant")
+
+# Initialize session state
+if "chat_ready" not in st.session_state:
+    st.session_state.chat_ready = False
+if "chat_engine" not in st.session_state:
+    st.session_state.chat_engine = None
 
 # Function for extracting links
 def extract_links(base_url):
@@ -58,7 +63,6 @@ def extract_links(base_url):
 
 # Input for website URL
 base_url = st.text_input("Enter Website URL:", placeholder="https://example.com")
-chat_ready = False
 
 if st.button("Process Website") and base_url:
     with st.spinner("Extracting links and setting up..."):
@@ -82,17 +86,17 @@ if st.button("Process Website") and base_url:
             )
             query_engine = index.as_query_engine()
             memory = ChatMemoryBuffer.from_defaults(token_limit=3000)
-            chat_engine = index.as_chat_engine(
+            st.session_state.chat_engine = index.as_chat_engine(
                 chat_mode="context",
                 memory=memory,
                 system_prompt="You are an AI assistant who answers the user's questions."
             )
-            chat_ready = True
+            st.session_state.chat_ready = True
 
 # Chat Interface
-if chat_ready:
+if st.session_state.chat_ready:
     st.subheader("Ask Questions About the Website")
     user_query = st.text_input("Enter your question:")
     if st.button("Chat") and user_query:
-        response = chat_engine.chat(user_query)
+        response = st.session_state.chat_engine.chat(user_query)
         st.write("**AI Assistant:**", response)
