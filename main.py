@@ -8,8 +8,8 @@ from llama_index.readers.web import SimpleWebPageReader
 from llama_index.core import Settings, VectorStoreIndex, StorageContext
 from llama_index.core.memory import ChatMemoryBuffer
 from llama_index.vector_stores.qdrant import QdrantVectorStore
-from llama_index.llms.gemini import Gemini
-from llama_index.embeddings.fastembed import FastEmbedEmbedding
+from llama_index.llms.openai import OpenAI
+from llama_index.embeddings.openai import OpenAIEmbedding
 import qdrant_client
 import os
 
@@ -69,8 +69,8 @@ if st.button("Process Website") and base_url:
             st.success(f"Extracted {len(links)} links from the website.")
             
             # LLM and embedding setup
-            llm = Gemini()
-            embedding_model = FastEmbedEmbedding()
+            llm = OpenAI()
+            embedding_model = OpenAIEmbedding()
             Settings.llm = llm
             Settings.embed_model = embedding_model
 
