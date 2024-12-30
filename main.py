@@ -80,7 +80,8 @@ if st.button("Process Website") and base_url:
                 collection_name="website",
                 client=client,
                 enable_hybrid=True,
-                batch_size=20
+                batch_size=20,
+                sparse_doc_fn = None
             )
 
             # Load and index documents
