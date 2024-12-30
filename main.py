@@ -1,13 +1,20 @@
+# Streamlit App Code
 import streamlit as st
 from urllib.parse import urljoin, urlparse
 from collections import deque
 import requests
 from bs4 import BeautifulSoup
 from llama_index.readers.web import SimpleWebPageReader
+from llama_index.core import Settings, VectorStoreIndex, StorageContext
+from llama_index.core.memory import ChatMemoryBuffer
+from llama_index.vector_stores.qdrant import QdrantVectorStore
 from llama_index.llms.gemini import Gemini
 from llama_index.embeddings.fastembed import FastEmbedEmbedding
-import faiss
-import numpy as np
+import qdrant_client
+import os
+
+# Get API Keys
+os.environ["GOOGLE_API_KEY"] = userdata.get("GOOGLE_API_KEY")
 
 # Set Streamlit page configuration
 st.set_page_config(page_title="Website Chat Assistant", layout="centered")
@@ -64,21 +71,31 @@ if st.button("Process Website") and base_url:
             # LLM and embedding setup
             llm = Gemini()
             embedding_model = FastEmbedEmbedding()
-            
-            # Load documents
+            Settings.llm = llm
+            Settings.embed_model = embedding_model
+
+            # Setup Qdrant
+            client = qdrant_client.QdrantClient(location=":memory:")
+            vector_store = QdrantVectorStore(
+                collection_name="website",
+                client=client,
+                enable_hybrid=True,
+                batch_size=20
+            )
+
+            # Load and index documents
             documents = SimpleWebPageReader(html_to_text=True).load_data(links)
-
-            # Generate embeddings
-            texts = [doc.text for doc in documents]
-            embeddings = np.array([embedding_model.embed(text) for text in texts])
-
-            # Set up FAISS index
-            dimension = embeddings.shape[1]
-            index = faiss.IndexFlatL2(dimension)
-            index.add(embeddings)
-
-            # Store text for retrieval
-            text_mapping = {i: text for i, text in enumerate(texts)}
+            storage_context = StorageContext.from_defaults(vector_store=vector_store)
+            index = VectorStoreIndex.from_documents(
+                documents, storage_context=storage_context
+            )
+            query_engine = index.as_query_engine(vector_store_query_mode="hybrid")
+            memory = ChatMemoryBuffer.from_defaults(token_limit=3000)
+            chat_engine = index.as_chat_engine(
+                chat_mode="context",
+                memory=memory,
+                system_prompt="You are an AI assistant who answers the user's questions."
+            )
             chat_ready = True
 
 # Chat Interface
@@ -86,11 +103,5 @@ if chat_ready:
     st.subheader("Ask Questions About the Website")
     user_query = st.text_input("Enter your question:")
     if st.button("Chat") and user_query:
-        # Query embedding
-        query_embedding = np.array([embedding_model.embed(user_query)])
-        _, indices = index.search(query_embedding, k=3)  # Top 3 results
-        responses = [text_mapping[i] for i in indices[0]]
-        
-        # Display results
-        for i, response in enumerate(responses, start=1):
-            st.write(f"**Result {i}:**", response)
+        response = chat_engine.chat(user_query)
+        st.write("**AI Assistant:**", response)
