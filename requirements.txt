@@ -6,3 +6,4 @@ llama-index-readers-web
 llama-index-vector-stores-qdrant
 qdrant-client
 requests
+streamlit
