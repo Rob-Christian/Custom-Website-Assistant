@@ -1,7 +1,7 @@
 beautifulsoup4
 llama-index
-llama-index-llms-gemini
-llama-index-embeddings-fastembed
+llama-index-llms-openai
+llama-index-embeddings-openai
 llama-index-readers-web
 llama-index-vector-stores-qdrant
 qdrant-client
