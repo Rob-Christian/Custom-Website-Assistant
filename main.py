@@ -9,7 +9,7 @@ from llama_index.core import Settings, VectorStoreIndex, StorageContext
 from llama_index.core.memory import ChatMemoryBuffer
 from llama_index.vector_stores.qdrant import QdrantVectorStore
 from llama_index.llms.openai import OpenAI
-from llama_index.embeddings.openai import OpenAIEmbedding
+from llama_index.embeddings.fastembed import FastEmbedEmbedding
 import qdrant_client
 import os
 
@@ -70,7 +70,7 @@ if st.button("Process Website") and base_url:
             
             # LLM and embedding setup
             llm = OpenAI()
-            embedding_model = OpenAIEmbedding()
+            embedding_model = FastEmbedEmbedding()
             Settings.llm = llm
             Settings.embed_model = embedding_model
 
@@ -81,7 +81,6 @@ if st.button("Process Website") and base_url:
                 client=client,
                 enable_hybrid=True,
                 batch_size=20,
-                sparse_doc_fn = None
             )
 
             # Load and index documents
